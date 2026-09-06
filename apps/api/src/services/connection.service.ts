@@ -1,6 +1,7 @@
 import { connectionRepository } from '../repositories/connection.repository.js';
 import { notificationRepository } from '../repositories/notification.repository.js';
 import { AppError } from '../middleware/error.middleware.js';
+import { emailService } from './email.service.js';
 
 export const connectionService = {
   async sendRequest(requesterId: string, addresseeId: string) {
@@ -25,6 +26,11 @@ export const connectionService = {
       message: 'You have a new connection request',
     });
 
+    emailService.sendConnectionRequest(
+      connection.addressee.email,
+      connection.requester.profile?.fullName ?? 'Someone',
+    );
+
     return connection;
   },
 
@@ -42,6 +48,11 @@ export const connectionService = {
       message: 'Your connection request was accepted',
     });
 
+    emailService.sendConnectionAccepted(
+      connection.requester.email,
+      connection.addressee.profile?.fullName ?? 'Someone',
+    );
+
     return updated;
   },
 
@@ -58,6 +69,11 @@ export const connectionService = {
       type: 'CONNECTION_DECLINED',
       message: 'Your connection request was declined',
     });
+
+    emailService.sendConnectionDeclined(
+      connection.requester.email,
+      connection.addressee.profile?.fullName ?? 'Someone',
+    );
 
     return updated;
   },

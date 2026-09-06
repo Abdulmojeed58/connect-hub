@@ -6,6 +6,7 @@ import { profileRepository } from '../repositories/profile.repository.js';
 import { tokenRepository } from '../repositories/token.repository.js';
 import { userRepository } from '../repositories/user.repository.js';
 import { AppError } from '../middleware/error.middleware.js';
+import { emailService } from './email.service.js';
 
 export const authService = {
   async register(fullName: string, email: string, password: string) {
@@ -16,6 +17,8 @@ export const authService = {
     const user = await userRepository.create({ email, passwordHash });
     await profileRepository.create({ userId: user.id, fullName });
 
+    emailService.sendWelcome(email, fullName);
+
     return issueTokens(user.id, user.email);
   },
 
@@ -25,6 +28,9 @@ export const authService = {
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) throw new AppError(401, 'Invalid credentials');
+
+    const profile = await profileRepository.findByUserId(user.id);
+    emailService.sendLoginAlert(email, profile?.fullName ?? 'there');
 
     return issueTokens(user.id, user.email);
   },

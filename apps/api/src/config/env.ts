@@ -10,6 +10,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  RESEND_API_KEY: z.string().min(1),
+  RESEND_FROM_EMAIL: z.string().default('ConnectHub <onboarding@resend.dev>'),
 });
 
 const parsed = envSchema.safeParse(process.env);
