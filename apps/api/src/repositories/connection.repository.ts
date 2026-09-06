@@ -57,4 +57,11 @@ export const connectionRepository = {
       include: connectionInclude,
     });
   },
+
+  findPendingSent(userId: string) {
+    return prisma.connection.findMany({
+      where: { requesterId: userId, status: 'pending' },
+      include: connectionInclude,
+    });
+  },
 };

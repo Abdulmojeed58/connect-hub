@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, Users, Link2, Bell, LogOut } from 'lucide-react';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
@@ -5,6 +6,9 @@ import { usePendingRequests } from '@/hooks/useConnections';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 function getInitials(name: string) {
@@ -20,10 +24,11 @@ const navItems = [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { data } = useCurrentUser();
-  const { mutate: logout } = useLogout();
+  const { mutate: logout, isPending: loggingOut } = useLogout();
   const navigate = useNavigate();
   const { data: pending } = usePendingRequests();
   const { data: notifications } = useNotifications();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const pendingCount = pending?.requests.length ?? 0;
   const unreadCount = notifications?.notifications.filter((n) => !n.isRead).length ?? 0;
@@ -96,7 +101,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </Avatar>
               </button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => logout()}>
+            <Button variant="ghost" size="icon" onClick={() => setShowLogoutDialog(true)}>
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -104,6 +109,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sign out</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to sign out of ConnectHub?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLogoutDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={loggingOut}
+              onClick={() => logout()}
+            >
+              {loggingOut ? 'Signing out…' : 'Sign out'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

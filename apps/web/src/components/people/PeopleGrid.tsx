@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
-import { useConnections } from '@/hooks/useConnections';
+import { useConnections, useSentRequests } from '@/hooks/useConnections';
 import { Button } from '@/components/ui/button';
 import { UserCard } from '@/components/people/UserCard';
 
@@ -10,13 +10,22 @@ export function PeopleGrid() {
   const { data: me } = useCurrentUser();
   const { data, isLoading } = useUsers(page);
   const { data: connectionsData } = useConnections();
+  const { data: sentData } = useSentRequests();
 
-  const connectedIds = new Set((connectionsData?.connections ?? []).flatMap((c) => c.status === 'accepted' ? [c.requesterId, c.addresseeId] : []));
-  const pendingIds = new Set((connectionsData?.connections ?? []).flatMap((c) => c.status === 'pending' ? [c.requesterId, c.addresseeId] : []));
+  const connectedIds = new Set(
+    (connectionsData?.connections ?? []).flatMap((c) =>
+      [c.requesterId, c.addresseeId],
+    ),
+  );
+
+  // Map of addresseeId → connectionId for pending-sent requests
+  const sentMap = new Map(
+    (sentData?.requests ?? []).map((c) => [c.addresseeId, c.id]),
+  );
 
   const getStatus = (userId: string): 'none' | 'pending' | 'connected' => {
     if (connectedIds.has(userId)) return 'connected';
-    if (pendingIds.has(userId)) return 'pending';
+    if (sentMap.has(userId)) return 'pending';
     return 'none';
   };
 
@@ -38,7 +47,12 @@ export function PeopleGrid() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {others.map((user) => (
-            <UserCard key={user.id} user={user} connectionStatus={getStatus(user.id)} />
+            <UserCard
+              key={user.id}
+              user={user}
+              connectionStatus={getStatus(user.id)}
+              pendingConnectionId={sentMap.get(user.id)}
+            />
           ))}
         </div>
       )}

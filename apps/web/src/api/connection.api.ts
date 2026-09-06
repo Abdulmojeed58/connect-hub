@@ -17,6 +17,11 @@ export const connectionApi = {
     return data.data;
   },
 
+  sent: async (): Promise<PendingRequestsResponse> => {
+    const { data } = await api.get<ApiSuccess<PendingRequestsResponse>>('/api/connections/sent');
+    return data.data;
+  },
+
   sendRequest: async (userId: string): Promise<ConnectionWithProfiles> => {
     const { data } = await api.post<ApiSuccess<ConnectionWithProfiles>>(`/api/connections/request/${userId}`);
     return data.data;

@@ -80,4 +80,8 @@ export const connectionService = {
   async listPending(userId: string) {
     return connectionRepository.findPendingReceived(userId);
   },
+
+  async listSent(userId: string) {
+    return connectionRepository.findPendingSent(userId);
+  },
 };

@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useSendConnectionRequest } from '@/hooks/useConnections';
+import { useSendConnectionRequest, useRemoveConnection } from '@/hooks/useConnections';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,23 +14,15 @@ type UserWithProfile = User & { profile: Profile | null };
 export function UserCard({
   user,
   connectionStatus,
+  pendingConnectionId,
 }: {
   user: UserWithProfile;
   connectionStatus: 'none' | 'pending' | 'connected';
+  pendingConnectionId?: string;
 }) {
   const navigate = useNavigate();
-  const { mutate: sendRequest, isPending } = useSendConnectionRequest();
-  const [localStatus, setLocalStatus] = useState(connectionStatus);
-
-  const handleConnect = () => {
-    sendRequest(user.id, {
-      onSuccess: () => setLocalStatus('pending'),
-      onError: (err) => {
-        const msg = axios.isAxiosError(err) ? (err.response?.data as { error?: string })?.error : undefined;
-        if (msg) console.error(msg);
-      },
-    });
-  };
+  const { mutate: sendRequest, isPending: sending } = useSendConnectionRequest();
+  const { mutate: withdraw, isPending: withdrawing } = useRemoveConnection();
 
   return (
     <Card className="transition-shadow hover:shadow-md">
@@ -49,12 +39,21 @@ export function UserCard({
             {user.profile?.headline && <p className="truncate text-sm text-muted-foreground">{user.profile.headline}</p>}
           </button>
         </div>
-        {localStatus === 'connected' ? (
+        {connectionStatus === 'connected' ? (
           <Button variant="secondary" size="sm" disabled>Connected</Button>
-        ) : localStatus === 'pending' ? (
-          <Button variant="outline" size="sm" disabled>Pending</Button>
+        ) : connectionStatus === 'pending' && pendingConnectionId ? (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={withdrawing}
+            onClick={() => withdraw(pendingConnectionId)}
+          >
+            {withdrawing ? 'Withdrawing…' : 'Withdraw'}
+          </Button>
         ) : (
-          <Button size="sm" onClick={handleConnect} disabled={isPending}>{isPending ? '…' : 'Connect'}</Button>
+          <Button size="sm" onClick={() => sendRequest(user.id)} disabled={sending}>
+            {sending ? '…' : 'Connect'}
+          </Button>
         )}
       </CardContent>
     </Card>

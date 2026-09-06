@@ -58,4 +58,13 @@ export const connectionController = {
       next(err);
     }
   },
+
+  async listSent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requests = await connectionService.listSent(req.user!.sub);
+      res.json({ success: true, data: { requests } });
+    } catch (err) {
+      next(err);
+    }
+  },
 };

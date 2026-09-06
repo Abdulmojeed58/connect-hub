@@ -4,6 +4,7 @@ import { queryClient } from '@/lib/query-client';
 
 const CONNECTIONS_KEY = ['connections'] as const;
 const PENDING_KEY = ['connections', 'pending'] as const;
+const SENT_KEY = ['connections', 'sent'] as const;
 
 export function useConnections() {
   return useQuery({ queryKey: CONNECTIONS_KEY, queryFn: connectionApi.list });
@@ -13,11 +14,16 @@ export function usePendingRequests() {
   return useQuery({ queryKey: PENDING_KEY, queryFn: connectionApi.pending });
 }
 
+export function useSentRequests() {
+  return useQuery({ queryKey: SENT_KEY, queryFn: connectionApi.sent });
+}
+
 export function useSendConnectionRequest() {
   return useMutation({
     mutationFn: connectionApi.sendRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CONNECTIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: SENT_KEY });
     },
   });
 }
@@ -46,6 +52,7 @@ export function useRemoveConnection() {
     mutationFn: connectionApi.remove,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CONNECTIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: SENT_KEY });
     },
   });
 }

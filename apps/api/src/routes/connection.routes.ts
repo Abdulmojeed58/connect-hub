@@ -6,6 +6,7 @@ const router: IRouter = Router();
 
 router.get('/', requireAuth, connectionController.listAccepted);
 router.get('/pending', requireAuth, connectionController.listPending);
+router.get('/sent', requireAuth, connectionController.listSent);
 router.post('/request/:userId', requireAuth, connectionController.sendRequest);
 router.post('/:id/accept', requireAuth, connectionController.accept);
 router.post('/:id/decline', requireAuth, connectionController.decline);

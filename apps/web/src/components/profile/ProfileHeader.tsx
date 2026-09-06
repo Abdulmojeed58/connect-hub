@@ -1,5 +1,10 @@
 import { MapPin } from 'lucide-react';
-import { useSendConnectionRequest } from '@/hooks/useConnections';
+import {
+  useSendConnectionRequest,
+  useRemoveConnection,
+  useAcceptConnection,
+  useDeclineConnection,
+} from '@/hooks/useConnections';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,12 +21,19 @@ export function ProfileHeader({
   profile,
   userId,
   isOwnProfile,
+  connectionStatus,
+  pendingConnectionId,
 }: {
   profile: FullProfile;
   userId: string;
   isOwnProfile: boolean;
+  connectionStatus: 'none' | 'sent' | 'received' | 'connected';
+  pendingConnectionId?: string;
 }) {
   const { mutate: sendRequest, isPending: sending } = useSendConnectionRequest();
+  const { mutate: withdraw, isPending: withdrawing } = useRemoveConnection();
+  const { mutate: accept, isPending: accepting } = useAcceptConnection();
+  const { mutate: decline, isPending: declining } = useDeclineConnection();
 
   return (
     <Card>
@@ -45,9 +57,39 @@ export function ProfileHeader({
               )}
             </div>
           </div>
+
           <div className="shrink-0">
             {isOwnProfile ? (
               <EditProfileDialog profile={profile} userId={userId} />
+            ) : connectionStatus === 'connected' ? (
+              <Button size="sm" variant="secondary" disabled>Connected</Button>
+            ) : connectionStatus === 'sent' && pendingConnectionId ? (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={withdrawing}
+                onClick={() => withdraw(pendingConnectionId)}
+              >
+                {withdrawing ? 'Withdrawing…' : 'Withdraw request'}
+              </Button>
+            ) : connectionStatus === 'received' && pendingConnectionId ? (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  disabled={accepting || declining}
+                  onClick={() => accept(pendingConnectionId)}
+                >
+                  {accepting ? 'Accepting…' : 'Accept'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={accepting || declining}
+                  onClick={() => decline(pendingConnectionId)}
+                >
+                  {declining ? 'Declining…' : 'Decline'}
+                </Button>
+              </div>
             ) : (
               <Button size="sm" onClick={() => sendRequest(userId)} disabled={sending}>
                 {sending ? 'Sending…' : 'Connect'}
@@ -55,6 +97,7 @@ export function ProfileHeader({
             )}
           </div>
         </div>
+
         {profile.bio && (
           <>
             <Separator className="my-4" />
