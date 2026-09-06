@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAddExperience } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +26,14 @@ export function AddExperienceDialog({ userId }: { userId: string }) {
         ...(form.endDate && { endDate: new Date(form.endDate).toISOString() }),
         ...(form.description && { description: form.description }),
       },
-      { onSuccess: () => { setOpen(false); setForm({ company: '', title: '', startDate: '', endDate: '', description: '' }); } },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          setForm({ company: '', title: '', startDate: '', endDate: '', description: '' });
+          toast.success('Experience added');
+        },
+        onError: () => toast.error('Failed to add experience'),
+      },
     );
   };
 

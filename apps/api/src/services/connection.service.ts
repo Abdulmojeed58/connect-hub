@@ -89,12 +89,12 @@ export const connectionService = {
     return connectionRepository.delete(connectionId);
   },
 
-  async listAccepted(userId: string) {
-    return connectionRepository.findAccepted(userId);
+  async listAccepted(userId: string, search?: string) {
+    return connectionRepository.findAccepted(userId, search);
   },
 
-  async listPending(userId: string) {
-    return connectionRepository.findPendingReceived(userId);
+  async listPending(userId: string, search?: string) {
+    return connectionRepository.findPendingReceived(userId, search);
   },
 
   async listSent(userId: string) {

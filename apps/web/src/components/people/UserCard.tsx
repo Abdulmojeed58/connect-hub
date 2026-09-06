@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useSendConnectionRequest, useRemoveConnection } from '@/hooks/useConnections';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -46,12 +47,22 @@ export function UserCard({
             variant="outline"
             size="sm"
             disabled={withdrawing}
-            onClick={() => withdraw(pendingConnectionId)}
+            onClick={() => withdraw(pendingConnectionId, {
+              onSuccess: () => toast.success('Request withdrawn'),
+              onError: () => toast.error('Failed to withdraw request'),
+            })}
           >
             {withdrawing ? 'Withdrawing…' : 'Withdraw'}
           </Button>
         ) : (
-          <Button size="sm" onClick={() => sendRequest(user.id)} disabled={sending}>
+          <Button
+            size="sm"
+            disabled={sending}
+            onClick={() => sendRequest(user.id, {
+              onSuccess: () => toast.success(`Request sent to ${user.profile?.fullName ?? 'user'}`),
+              onError: () => toast.error('Failed to send request'),
+            })}
+          >
             {sending ? '…' : 'Connect'}
           </Button>
         )}

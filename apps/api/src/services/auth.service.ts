@@ -56,11 +56,13 @@ export const authService = {
     const user = await userRepository.findById(userId);
     if (!user) throw new AppError(404, 'User not found');
     const profile = await profileRepository.findByUserId(userId);
-    return { user, profile };
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash: _pw, ...safeUser } = user;
+    return { user: safeUser, profile };
   },
 };
 
-/** Parses simple duration strings like "7d", "15m", "1h" to milliseconds. */
 function parseDuration(duration: string): number {
   const match = /^(\d+)([smhd])$/.exec(duration);
   if (!match) return 7 * 24 * 60 * 60 * 1000; // default 7 days

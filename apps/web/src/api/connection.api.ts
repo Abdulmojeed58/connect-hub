@@ -7,13 +7,23 @@ import type {
 import api from './axios';
 
 export const connectionApi = {
-  list: async (): Promise<ConnectionsListResponse> => {
-    const { data } = await api.get<ApiSuccess<ConnectionsListResponse>>('/api/connections');
+  list: async (search?: string): Promise<ConnectionsListResponse> => {
+    const params = new URLSearchParams();
+    if (search?.trim()) params.set('search', search.trim());
+    const qs = params.toString();
+    const { data } = await api.get<ApiSuccess<ConnectionsListResponse>>(
+      `/api/connections${qs ? `?${qs}` : ''}`,
+    );
     return data.data;
   },
 
-  pending: async (): Promise<PendingRequestsResponse> => {
-    const { data } = await api.get<ApiSuccess<PendingRequestsResponse>>('/api/connections/pending');
+  pending: async (search?: string): Promise<PendingRequestsResponse> => {
+    const params = new URLSearchParams();
+    if (search?.trim()) params.set('search', search.trim());
+    const qs = params.toString();
+    const { data } = await api.get<ApiSuccess<PendingRequestsResponse>>(
+      `/api/connections/pending${qs ? `?${qs}` : ''}`,
+    );
     return data.data;
   },
 

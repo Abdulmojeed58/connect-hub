@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAcceptConnection, useDeclineConnection } from '@/hooks/useConnections';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -31,8 +32,27 @@ export function PendingRow({ connection }: { connection: ConnectionWithProfiles 
         </button>
       </div>
       <div className="flex gap-2">
-        <Button size="sm" onClick={() => accept(connection.id)} disabled={accepting}><Check className="mr-1 h-3.5 w-3.5" /> Accept</Button>
-        <Button size="sm" variant="outline" onClick={() => decline(connection.id)} disabled={declining}><X className="mr-1 h-3.5 w-3.5" /> Decline</Button>
+        <Button
+          size="sm"
+          onClick={() => accept(connection.id, {
+            onSuccess: () => toast.success(`Connected with ${profile?.fullName ?? 'user'}`),
+            onError: () => toast.error('Failed to accept request'),
+          })}
+          disabled={accepting}
+        >
+          <Check className="mr-1 h-3.5 w-3.5" /> Accept
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => decline(connection.id, {
+            onSuccess: () => toast.success('Request declined'),
+            onError: () => toast.error('Failed to decline request'),
+          })}
+          disabled={declining}
+        >
+          <X className="mr-1 h-3.5 w-3.5" /> Decline
+        </Button>
       </div>
     </div>
   );

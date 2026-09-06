@@ -1,14 +1,19 @@
 import { useState } from 'react';
+import { Search } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
 import { useConnections, useSentRequests } from '@/hooks/useConnections';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { UserCard } from '@/components/people/UserCard';
 
 export function PeopleGrid() {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
   const { data: me } = useCurrentUser();
-  const { data, isLoading } = useUsers(page);
+  const { data, isLoading } = useUsers(page, 20, debouncedSearch || undefined);
   const { data: connectionsData } = useConnections();
   const { data: sentData } = useSentRequests();
 
@@ -32,11 +37,25 @@ export function PeopleGrid() {
   const others = (data?.users ?? []).filter((u) => u.id !== me?.user.id);
   const totalPages = data ? Math.ceil(data.total / data.limit) : 1;
 
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">People</h1>
         {data && <p className="text-sm text-muted-foreground">{data.total} members</p>}
+      </div>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search by name…"
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="pl-9"
+        />
       </div>
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
@@ -51,7 +70,7 @@ export function PeopleGrid() {
               key={user.id}
               user={user}
               connectionStatus={getStatus(user.id)}
-              pendingConnectionId={sentMap.get(user.id)}
+              {...(sentMap.has(user.id) && { pendingConnectionId: sentMap.get(user.id)! })}
             />
           ))}
         </div>

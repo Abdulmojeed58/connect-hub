@@ -51,7 +51,13 @@ export function ProfileView() {
 
   return (
     <div className="space-y-5">
-      <ProfileHeader profile={profile} userId={userId!} isOwnProfile={isOwnProfile} connectionStatus={connectionStatus} pendingConnectionId={pendingConnectionId} />
+      <ProfileHeader
+        profile={profile}
+        userId={userId!}
+        isOwnProfile={isOwnProfile}
+        connectionStatus={connectionStatus}
+        {...(pendingConnectionId && { pendingConnectionId })}
+      />
       <ExperienceSection experiences={profile.experiences} userId={userId!} isOwnProfile={isOwnProfile} />
       <EducationSection educations={profile.educations} userId={userId!} isOwnProfile={isOwnProfile} />
     </div>

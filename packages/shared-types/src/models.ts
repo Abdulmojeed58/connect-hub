@@ -18,15 +18,12 @@ export interface User {
 
 export interface Profile {
   id: string;
-  userId: string;
   fullName: string;
   headline: string | null;
   bio: string | null;
   location: string | null;
   photoUrl: string | null;
   isPremium: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface Experience {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pencil } from 'lucide-react';
+import { toast } from 'sonner';
 import { useUpdateProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,7 +29,10 @@ export function EditProfileDialog({ profile, userId }: { profile: FullProfile; u
         ...(form.location && { location: form.location }),
         ...(form.photoUrl && { photoUrl: form.photoUrl }),
       },
-      { onSuccess: () => setOpen(false) },
+      {
+        onSuccess: () => { setOpen(false); toast.success('Profile updated'); },
+        onError: () => toast.error('Failed to update profile'),
+      },
     );
   };
 

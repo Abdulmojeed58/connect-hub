@@ -5,7 +5,18 @@ export const profileRepository = {
   findByUserId(userId: string) {
     return prisma.profile.findUnique({
       where: { userId },
-      include: { user: true, experiences: true, educations: true },
+      select: {
+        id: true,
+        fullName: true,
+        headline: true,
+        bio: true,
+        location: true,
+        photoUrl: true,
+        isPremium: true,
+        user: { select: { id: true, email: true, createdAt: true } },
+        experiences: true,
+        educations: true,
+      },
     });
   },
 
@@ -17,7 +28,18 @@ export const profileRepository = {
     return prisma.profile.update({
       where: { userId },
       data,
-      include: { user: true, experiences: true, educations: true },
+      select: {
+        id: true,
+        fullName: true,
+        headline: true,
+        bio: true,
+        location: true,
+        photoUrl: true,
+        isPremium: true,
+        user: { select: { id: true, email: true, createdAt: true } },
+        experiences: true,
+        educations: true,
+      },
     });
   },
 

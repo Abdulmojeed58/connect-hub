@@ -6,12 +6,18 @@ const CONNECTIONS_KEY = ['connections'] as const;
 const PENDING_KEY = ['connections', 'pending'] as const;
 const SENT_KEY = ['connections', 'sent'] as const;
 
-export function useConnections() {
-  return useQuery({ queryKey: CONNECTIONS_KEY, queryFn: connectionApi.list });
+export function useConnections(search?: string) {
+  return useQuery({
+    queryKey: [...CONNECTIONS_KEY, search ?? ''],
+    queryFn: () => connectionApi.list(search),
+  });
 }
 
-export function usePendingRequests() {
-  return useQuery({ queryKey: PENDING_KEY, queryFn: connectionApi.pending });
+export function usePendingRequests(search?: string) {
+  return useQuery({
+    queryKey: [...PENDING_KEY, search ?? ''],
+    queryFn: () => connectionApi.pending(search),
+  });
 }
 
 export function useSentRequests() {

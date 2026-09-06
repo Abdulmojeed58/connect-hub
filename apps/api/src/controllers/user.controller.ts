@@ -6,7 +6,8 @@ export const userController = {
     try {
       const page = Math.max(1, parseInt(String(req.query['page'] ?? '1'), 10));
       const limit = Math.min(50, Math.max(1, parseInt(String(req.query['limit'] ?? '20'), 10)));
-      const data = await userService.list(page, limit);
+      const search = req.query['search'] ? String(req.query['search']) : undefined;
+      const data = await userService.list(page, limit, search);
       res.json({ success: true, data });
     } catch (err) {
       next(err);

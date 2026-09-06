@@ -43,7 +43,8 @@ export const connectionController = {
 
   async listAccepted(req: Request, res: Response, next: NextFunction) {
     try {
-      const connections = await connectionService.listAccepted(req.user!.sub);
+      const search = req.query['search'] ? String(req.query['search']) : undefined;
+      const connections = await connectionService.listAccepted(req.user!.sub, search);
       res.json({ success: true, data: { connections } });
     } catch (err) {
       next(err);
@@ -52,7 +53,8 @@ export const connectionController = {
 
   async listPending(req: Request, res: Response, next: NextFunction) {
     try {
-      const requests = await connectionService.listPending(req.user!.sub);
+      const search = req.query['search'] ? String(req.query['search']) : undefined;
+      const requests = await connectionService.listPending(req.user!.sub, search);
       res.json({ success: true, data: { requests } });
     } catch (err) {
       next(err);

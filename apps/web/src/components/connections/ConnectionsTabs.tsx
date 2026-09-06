@@ -1,20 +1,35 @@
+import { useState } from 'react';
+import { Search } from 'lucide-react';
 import { useConnections, usePendingRequests } from '@/hooks/useConnections';
 import { useCurrentUser } from '@/hooks/useAuth';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConnectionRow } from '@/components/connections/ConnectionRow';
 import { PendingRow } from '@/components/connections/PendingRow';
 
 export function ConnectionsTabs() {
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
   const { data: me } = useCurrentUser();
-  const { data: connectionsData, isLoading: loadingConnections } = useConnections();
-  const { data: pendingData, isLoading: loadingPending } = usePendingRequests();
+  const { data: connectionsData, isLoading: loadingConnections } = useConnections(debouncedSearch || undefined);
+  const { data: pendingData, isLoading: loadingPending } = usePendingRequests(debouncedSearch || undefined);
   const connections = connectionsData?.connections ?? [];
   const pending = pendingData?.requests ?? [];
 
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Connections</h1>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search by name…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
+      </div>
       <Tabs defaultValue="connections">
         <TabsList>
           <TabsTrigger value="connections">My Connections {connections.length > 0 && `(${connections.length})`}</TabsTrigger>

@@ -1,9 +1,26 @@
 import type { ConnectionStatus } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 
+const publicUserSelect = {
+  id: true,
+  email: true,
+  createdAt: true,
+  profile: {
+    select: {
+      id: true,
+      fullName: true,
+      headline: true,
+      bio: true,
+      location: true,
+      photoUrl: true,
+      isPremium: true,
+    },
+  },
+} as const;
+
 const connectionInclude = {
-  requester: { include: { profile: true } },
-  addressee: { include: { profile: true } },
+  requester: { select: publicUserSelect },
+  addressee: { select: publicUserSelect },
 } as const;
 
 export const connectionRepository = {
@@ -41,19 +58,35 @@ export const connectionRepository = {
     return prisma.connection.delete({ where: { id } });
   },
 
-  findAccepted(userId: string) {
+  findAccepted(userId: string, search?: string) {
+    const q = search?.trim();
     return prisma.connection.findMany({
       where: {
         status: 'accepted',
         OR: [{ requesterId: userId }, { addresseeId: userId }],
+        ...(q && {
+          AND: {
+            OR: [
+              { requester: { profile: { fullName: { contains: q, mode: 'insensitive' } } } },
+              { addressee: { profile: { fullName: { contains: q, mode: 'insensitive' } } } },
+            ],
+          },
+        }),
       },
       include: connectionInclude,
     });
   },
 
-  findPendingReceived(userId: string) {
+  findPendingReceived(userId: string, search?: string) {
+    const q = search?.trim();
     return prisma.connection.findMany({
-      where: { addresseeId: userId, status: 'pending' },
+      where: {
+        addresseeId: userId,
+        status: 'pending',
+        ...(q && {
+          requester: { profile: { fullName: { contains: q, mode: 'insensitive' } } },
+        }),
+      },
       include: connectionInclude,
     });
   },

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAddEducation } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,14 @@ export function AddEducationDialog({ userId }: { userId: string }) {
     if (!form.school || !form.degree || !form.field || !form.year) return;
     mutate(
       { school: form.school, degree: form.degree, field: form.field, year: parseInt(form.year, 10) },
-      { onSuccess: () => { setOpen(false); setForm({ school: '', degree: '', field: '', year: '' }); } },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          setForm({ school: '', degree: '', field: '', year: '' });
+          toast.success('Education added');
+        },
+        onError: () => toast.error('Failed to add education'),
+      },
     );
   };
 

@@ -1,4 +1,5 @@
 import { MapPin } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   useSendConnectionRequest,
   useRemoveConnection,
@@ -68,7 +69,10 @@ export function ProfileHeader({
                 size="sm"
                 variant="outline"
                 disabled={withdrawing}
-                onClick={() => withdraw(pendingConnectionId)}
+                onClick={() => withdraw(pendingConnectionId, {
+                  onSuccess: () => toast.success('Request withdrawn'),
+                  onError: () => toast.error('Failed to withdraw request'),
+                })}
               >
                 {withdrawing ? 'Withdrawing…' : 'Withdraw request'}
               </Button>
@@ -77,7 +81,10 @@ export function ProfileHeader({
                 <Button
                   size="sm"
                   disabled={accepting || declining}
-                  onClick={() => accept(pendingConnectionId)}
+                  onClick={() => accept(pendingConnectionId, {
+                    onSuccess: () => toast.success(`Connected with ${profile.fullName}`),
+                    onError: () => toast.error('Failed to accept request'),
+                  })}
                 >
                   {accepting ? 'Accepting…' : 'Accept'}
                 </Button>
@@ -85,13 +92,23 @@ export function ProfileHeader({
                   size="sm"
                   variant="outline"
                   disabled={accepting || declining}
-                  onClick={() => decline(pendingConnectionId)}
+                  onClick={() => decline(pendingConnectionId, {
+                    onSuccess: () => toast.success('Request declined'),
+                    onError: () => toast.error('Failed to decline request'),
+                  })}
                 >
                   {declining ? 'Declining…' : 'Decline'}
                 </Button>
               </div>
             ) : (
-              <Button size="sm" onClick={() => sendRequest(userId)} disabled={sending}>
+              <Button
+                size="sm"
+                disabled={sending}
+                onClick={() => sendRequest(userId, {
+                  onSuccess: () => toast.success(`Request sent to ${profile.fullName}`),
+                  onError: () => toast.error('Failed to send request'),
+                })}
+              >
                 {sending ? 'Sending…' : 'Connect'}
               </Button>
             )}

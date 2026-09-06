@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserX } from 'lucide-react';
+import { toast } from 'sonner';
 import { useRemoveConnection } from '@/hooks/useConnections';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -64,7 +65,13 @@ export function ConnectionRow({
             <Button
               variant="destructive"
               disabled={isPending}
-              onClick={() => remove(connection.id, { onSuccess: () => setShowDialog(false) })}
+              onClick={() => remove(connection.id, {
+                onSuccess: () => {
+                  setShowDialog(false);
+                  toast.success(`Removed ${profile?.fullName ?? 'connection'}`);
+                },
+                onError: () => toast.error('Failed to remove connection'),
+              })}
             >
               {isPending ? 'Removing…' : 'Remove'}
             </Button>
