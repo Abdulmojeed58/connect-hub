@@ -71,12 +71,16 @@ export interface AddExperienceRequest {
   description?: string;
 }
 
+export type UpdateExperienceRequest = AddExperienceRequest;
+
 export interface AddEducationRequest {
   school: string;
   degree: string;
   field: string;
   year: number;
 }
+
+export type UpdateEducationRequest = AddEducationRequest;
 
 // --- Users ---
 

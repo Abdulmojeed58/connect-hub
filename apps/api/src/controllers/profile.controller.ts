@@ -29,10 +29,46 @@ export const profileController = {
     }
   },
 
+  async updateExperience(req: Request, res: Response, next: NextFunction) {
+    try {
+      const experience = await profileService.updateExperience(req.user!.sub, String(req.params['id']), req.body);
+      res.json({ success: true, data: experience });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async deleteExperience(req: Request, res: Response, next: NextFunction) {
+    try {
+      await profileService.deleteExperience(req.user!.sub, String(req.params['id']));
+      res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async addEducation(req: Request, res: Response, next: NextFunction) {
     try {
       const education = await profileService.addEducation(req.user!.sub, req.body);
       res.status(201).json({ success: true, data: education });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async updateEducation(req: Request, res: Response, next: NextFunction) {
+    try {
+      const education = await profileService.updateEducation(req.user!.sub, String(req.params['id']), req.body);
+      res.json({ success: true, data: education });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async deleteEducation(req: Request, res: Response, next: NextFunction) {
+    try {
+      await profileService.deleteEducation(req.user!.sub, String(req.params['id']));
+      res.status(204).send();
     } catch (err) {
       next(err);
     }

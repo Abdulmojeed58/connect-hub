@@ -30,9 +30,47 @@ export function useAddExperience(userId: string) {
   });
 }
 
+export function useUpdateExperience(userId: string) {
+  return useMutation({
+    mutationFn: ({ id, ...body }: { id: string } & Parameters<typeof profileApi.updateExperience>[1]) =>
+      profileApi.updateExperience(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+    },
+  });
+}
+
+export function useDeleteExperience(userId: string) {
+  return useMutation({
+    mutationFn: profileApi.deleteExperience,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+    },
+  });
+}
+
 export function useAddEducation(userId: string) {
   return useMutation({
     mutationFn: profileApi.addEducation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+    },
+  });
+}
+
+export function useUpdateEducation(userId: string) {
+  return useMutation({
+    mutationFn: ({ id, ...body }: { id: string } & Parameters<typeof profileApi.updateEducation>[1]) =>
+      profileApi.updateEducation(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+    },
+  });
+}
+
+export function useDeleteEducation(userId: string) {
+  return useMutation({
+    mutationFn: profileApi.deleteEducation,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
     },

@@ -32,6 +32,10 @@ const addEducationSchema = z.object({
 router.get('/:userId', requireAuth, profileController.getByUserId);
 router.put('/me', requireAuth, validate(updateProfileSchema), profileController.updateOwn);
 router.post('/me/experience', requireAuth, validate(addExperienceSchema), profileController.addExperience);
+router.put('/me/experience/:id', requireAuth, validate(addExperienceSchema), profileController.updateExperience);
+router.delete('/me/experience/:id', requireAuth, profileController.deleteExperience);
 router.post('/me/education', requireAuth, validate(addEducationSchema), profileController.addEducation);
+router.put('/me/education/:id', requireAuth, validate(addEducationSchema), profileController.updateEducation);
+router.delete('/me/education/:id', requireAuth, profileController.deleteEducation);
 
 export { router as profileRouter };

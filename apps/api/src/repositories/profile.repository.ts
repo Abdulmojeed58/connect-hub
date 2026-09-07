@@ -47,7 +47,31 @@ export const profileRepository = {
     return prisma.experience.create({ data: { ...data, profileId } });
   },
 
+  findExperienceById(id: string) {
+    return prisma.experience.findUnique({ where: { id } });
+  },
+
+  updateExperience(id: string, data: Prisma.ExperienceUncheckedUpdateWithoutProfileInput) {
+    return prisma.experience.update({ where: { id }, data });
+  },
+
+  deleteExperience(id: string) {
+    return prisma.experience.delete({ where: { id } });
+  },
+
   addEducation(profileId: string, data: Prisma.EducationUncheckedCreateWithoutProfileInput) {
     return prisma.education.create({ data: { ...data, profileId } });
+  },
+
+  findEducationById(id: string) {
+    return prisma.education.findUnique({ where: { id } });
+  },
+
+  updateEducation(id: string, data: Prisma.EducationUncheckedUpdateWithoutProfileInput) {
+    return prisma.education.update({ where: { id }, data });
+  },
+
+  deleteEducation(id: string) {
+    return prisma.education.delete({ where: { id } });
   },
 };

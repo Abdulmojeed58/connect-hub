@@ -130,6 +130,42 @@ export const emailService = {
     });
   },
 
+  sendPasswordResetLink(to: string, fullName: string, resetUrl: string) {
+    send({
+      from: FROM,
+      to,
+      subject: `Reset your ${APP_NAME} password`,
+      html: baseTemplate(`
+        ${heading('Reset your password')}
+        ${paragraph(`Hi ${fullName}, we received a request to reset your ${highlight(APP_NAME)} password.`)}
+        ${paragraph('Click the button below to choose a new password. This link expires in <strong>1 hour</strong>.')}
+        <div style="margin:0 0 16px;text-align:center;">
+          <a href="${resetUrl}" style="display:inline-block;padding:12px 28px;background:#0D51B2;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
+            Reset password
+          </a>
+        </div>
+        ${paragraph('If the button doesn\'t work, copy and paste this link into your browser:')}
+        <p style="margin:0 0 16px;font-size:13px;color:#71717a;word-break:break-all;">${resetUrl}</p>
+        ${paragraph('If you didn\'t request a password reset, you can safely ignore this email — your password will not change.')}
+      `),
+    });
+  },
+
+  sendPasswordChanged(to: string, fullName: string) {
+    const time = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    send({
+      from: FROM,
+      to,
+      subject: `Your ${APP_NAME} password was changed`,
+      html: baseTemplate(`
+        ${heading('Password changed')}
+        ${paragraph(`Hi ${fullName}, your ${highlight(APP_NAME)} password was successfully changed.`)}
+        ${paragraph(`<strong>Time:</strong> ${time}`)}
+        ${paragraph("If you didn't make this change, please contact support immediately and reset your password.")}
+      `),
+    });
+  },
+
   sendConnectionDeclined(to: string, declinerName: string) {
     send({
       from: FROM,

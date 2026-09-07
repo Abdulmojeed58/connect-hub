@@ -26,7 +26,7 @@ export function ExperienceSection({
           <div className="space-y-4">
             {experiences.map((exp, i) => (
               <div key={exp.id}>
-                <ExperienceCard exp={exp} />
+                <ExperienceCard exp={exp} userId={userId} isOwnProfile={isOwnProfile} />
                 {i < experiences.length - 1 && <Separator className="mt-4" />}
               </div>
             ))}

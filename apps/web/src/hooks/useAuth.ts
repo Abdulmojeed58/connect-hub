@@ -39,6 +39,31 @@ export function useRegister() {
   });
 }
 
+export function useChangePassword() {
+  const { clearAuth } = useAuthStore();
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: authApi.changePassword,
+    onSuccess: () => {
+      // All sessions were revoked on the server; clear local auth and redirect
+      clearAuth();
+      queryClient.clear();
+      navigate('/login');
+    },
+  });
+}
+
+export function useForgotPassword() {
+  return useMutation({ mutationFn: authApi.forgotPassword });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: ({ token, newPassword }: { token: string; newPassword: string }) =>
+      authApi.resetPassword(token, newPassword),
+  });
+}
+
 export function useLogout() {
   const { refreshToken, clearAuth } = useAuthStore();
   const navigate = useNavigate();

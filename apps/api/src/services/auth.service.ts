@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 import { env } from '../config/env.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../lib/jwt.js';
 import { profileRepository } from '../repositories/profile.repository.js';
 import { tokenRepository } from '../repositories/token.repository.js';
+import { passwordResetTokenRepository } from '../repositories/passwordResetToken.repository.js';
 import { userRepository } from '../repositories/user.repository.js';
 import { AppError } from '../middleware/error.middleware.js';
 import { emailService } from './email.service.js';
@@ -50,6 +51,58 @@ export const authService = {
     const user = await userRepository.findById(payload.sub);
     if (!user) throw new AppError(401, 'User not found');
     return issueTokens(user.id, user.email);
+  },
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new AppError(404, 'User not found');
+
+    const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!valid) throw new AppError(400, 'Current password is incorrect');
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await userRepository.updatePassword(userId, passwordHash);
+
+    // Revoke all refresh tokens so other sessions are forced to re-login
+    await tokenRepository.deleteAllForUser(userId);
+
+    const profile = await profileRepository.findByUserId(userId);
+    emailService.sendPasswordChanged(user.email, profile?.fullName ?? 'there');
+  },
+
+  async forgotPassword(email: string) {
+    const user = await userRepository.findByEmail(email);
+    // Always return success — never reveal whether an email is registered
+    if (!user) return;
+
+    // Invalidate any existing reset tokens for this user
+    await passwordResetTokenRepository.deleteAllForUser(user.id);
+
+    const token = randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await passwordResetTokenRepository.create({ token, userId: user.id, expiresAt });
+
+    const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${token}`;
+    const profile = await profileRepository.findByUserId(user.id);
+    emailService.sendPasswordResetLink(email, profile?.fullName ?? 'there', resetUrl);
+  },
+
+  async resetPassword(token: string, newPassword: string) {
+    const record = await passwordResetTokenRepository.findByToken(token);
+    if (!record || record.expiresAt < new Date()) {
+      throw new AppError(400, 'Reset link is invalid or has expired');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await userRepository.updatePassword(record.userId, passwordHash);
+
+    await passwordResetTokenRepository.deleteByToken(token);
+
+    await tokenRepository.deleteAllForUser(record.userId);
+
+    const user = await userRepository.findById(record.userId);
+    const profile = await profileRepository.findByUserId(record.userId);
+    if (user) emailService.sendPasswordChanged(user.email, profile?.fullName ?? 'there');
   },
 
   async getMe(userId: string) {

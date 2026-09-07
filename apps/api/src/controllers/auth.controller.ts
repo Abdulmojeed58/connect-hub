@@ -46,6 +46,36 @@ export const authController = {
     }
   },
 
+  async changePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { currentPassword, newPassword } = req.body as { currentPassword: string; newPassword: string };
+      await authService.changePassword(req.user!.sub, currentPassword, newPassword);
+      res.json({ success: true, data: null });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body as { email: string };
+      await authService.forgotPassword(email);
+      res.json({ success: true, data: null });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { token, newPassword } = req.body as { token: string; newPassword: string };
+      await authService.resetPassword(token, newPassword);
+      res.json({ success: true, data: null });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async me(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.sub;

@@ -26,7 +26,7 @@ export function EducationSection({
           <div className="space-y-4">
             {educations.map((edu, i) => (
               <div key={edu.id}>
-                <EducationCard edu={edu} />
+                <EducationCard edu={edu} userId={userId} isOwnProfile={isOwnProfile} />
                 {i < educations.length - 1 && <Separator className="mt-4" />}
               </div>
             ))}

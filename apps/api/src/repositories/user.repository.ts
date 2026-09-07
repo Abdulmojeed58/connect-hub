@@ -13,6 +13,10 @@ export const userRepository = {
     return prisma.user.create({ data });
   },
 
+  updatePassword(id: string, passwordHash: string) {
+    return prisma.user.update({ where: { id }, data: { passwordHash } });
+  },
+
   findManyPaginated(page: number, limit: number, search?: string) {
     const skip = (page - 1) * limit;
     const q = search?.trim();

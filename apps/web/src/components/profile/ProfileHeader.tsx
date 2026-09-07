@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
+import { ChangePasswordDialog } from '@/components/auth/ChangePasswordDialog';
 import type { FullProfile } from '@connecthub/shared-types';
 
 function getInitials(name: string) {
@@ -61,7 +62,10 @@ export function ProfileHeader({
 
           <div className="shrink-0">
             {isOwnProfile ? (
-              <EditProfileDialog profile={profile} userId={userId} />
+              <div className="flex flex-col items-end gap-2">
+                <EditProfileDialog profile={profile} userId={userId} />
+                <ChangePasswordDialog />
+              </div>
             ) : connectionStatus === 'connected' ? (
               <Button size="sm" variant="secondary" disabled>Connected</Button>
             ) : connectionStatus === 'sent' && pendingConnectionId ? (

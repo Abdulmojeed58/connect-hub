@@ -5,6 +5,8 @@ import type {
   Education,
   Experience,
   ProfileResponse,
+  UpdateEducationRequest,
+  UpdateExperienceRequest,
   UpdateProfileRequest,
 } from '@connecthub/shared-types';
 import api from './axios';
@@ -25,8 +27,26 @@ export const profileApi = {
     return data.data;
   },
 
+  updateExperience: async (id: string, body: UpdateExperienceRequest): Promise<Experience> => {
+    const { data } = await api.put<ApiSuccess<Experience>>(`/api/profiles/me/experience/${id}`, body);
+    return data.data;
+  },
+
+  deleteExperience: async (id: string): Promise<void> => {
+    await api.delete(`/api/profiles/me/experience/${id}`);
+  },
+
   addEducation: async (body: AddEducationRequest): Promise<Education> => {
     const { data } = await api.post<ApiSuccess<Education>>('/api/profiles/me/education', body);
     return data.data;
+  },
+
+  updateEducation: async (id: string, body: UpdateEducationRequest): Promise<Education> => {
+    const { data } = await api.put<ApiSuccess<Education>>(`/api/profiles/me/education/${id}`, body);
+    return data.data;
+  },
+
+  deleteEducation: async (id: string): Promise<void> => {
+    await api.delete(`/api/profiles/me/education/${id}`);
   },
 };
