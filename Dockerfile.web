@@ -12,10 +12,11 @@ RUN pnpm install --frozen-lockfile
 
 # ── Build ───────────────────────────────────────────────────────────────────────
 FROM deps AS builder
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 COPY packages/ packages/
 COPY apps/web/ apps/web/
 RUN pnpm --filter @connecthub/shared-types build
-# VITE_API_BASE_URL is intentionally empty — nginx proxies /api at runtime
 RUN pnpm --filter @connecthub/web build
 
 # ── Production image ────────────────────────────────────────────────────────────
