@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "ConnectHub",
+    "slug": "connecthub-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "connecthub",
+    "platforms": ["ios", "android"],
+    "assetBundlePatterns": ["**/*"],
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.connecthub.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0D51B2"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ]
+  }
+}

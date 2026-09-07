@@ -5,3 +5,5 @@ dist
 *.env.*
 *.env.local
 prisma/migrations
+.DS_Store
+.expo

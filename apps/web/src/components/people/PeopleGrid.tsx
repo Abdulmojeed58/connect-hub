@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
-import { useConnections, useSentRequests } from '@/hooks/useConnections';
+import { useConnections, useSentRequests, usePendingRequests } from '@/hooks/useConnections';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ export function PeopleGrid() {
   const { data, isLoading } = useUsers(page, 20, debouncedSearch || undefined);
   const { data: connectionsData } = useConnections();
   const { data: sentData } = useSentRequests();
+  const { data: pendingData } = usePendingRequests();
 
   const connectedIds = new Set(
     (connectionsData?.connections ?? []).flatMap((c) =>
@@ -28,9 +29,15 @@ export function PeopleGrid() {
     (sentData?.requests ?? []).map((c) => [c.addresseeId, c.id]),
   );
 
-  const getStatus = (userId: string): 'none' | 'pending' | 'connected' => {
+  // Map of requesterId → connectionId for incoming requests
+  const incomingMap = new Map(
+    (pendingData?.requests ?? []).map((c) => [c.requesterId, c.id]),
+  );
+
+  const getStatus = (userId: string): 'none' | 'pending' | 'connected' | 'incoming' => {
     if (connectedIds.has(userId)) return 'connected';
     if (sentMap.has(userId)) return 'pending';
+    if (incomingMap.has(userId)) return 'incoming';
     return 'none';
   };
 
@@ -71,6 +78,7 @@ export function PeopleGrid() {
               user={user}
               connectionStatus={getStatus(user.id)}
               {...(sentMap.has(user.id) && { pendingConnectionId: sentMap.get(user.id)! })}
+              {...(incomingMap.has(user.id) && { incomingConnectionId: incomingMap.get(user.id)! })}
             />
           ))}
         </div>
