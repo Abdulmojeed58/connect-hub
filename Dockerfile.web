@@ -23,5 +23,5 @@ RUN pnpm --filter @connecthub/web build
 FROM nginx:alpine AS runner
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 # Store template; entrypoint substitutes $PORT at runtime
-COPY apps/web/nginx.conf /etc/nginx/templates/default.conf.template
+COPY apps/web/nginx.railway.conf /etc/nginx/templates/default.conf.template
 EXPOSE 80

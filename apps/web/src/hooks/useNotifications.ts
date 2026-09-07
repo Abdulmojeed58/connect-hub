@@ -5,6 +5,8 @@ export function useNotifications() {
   return useQuery({
     queryKey: ['notifications'],
     queryFn: notificationApi.list,
+    staleTime: 0,
+    refetchOnMount: 'always',
     refetchInterval: 30_000, // poll every 30s
   });
 }

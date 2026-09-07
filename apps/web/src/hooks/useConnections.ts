@@ -10,6 +10,8 @@ export function useConnections(search?: string) {
   return useQuery({
     queryKey: [...CONNECTIONS_KEY, search ?? ''],
     queryFn: () => connectionApi.list(search),
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 }
 
@@ -17,6 +19,8 @@ export function usePendingRequests(search?: string) {
   return useQuery({
     queryKey: [...PENDING_KEY, search ?? ''],
     queryFn: () => connectionApi.pending(search),
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 }
 
