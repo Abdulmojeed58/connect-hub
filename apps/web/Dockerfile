@@ -1,0 +1,25 @@
+FROM node:20-alpine AS base
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+
+# ── Install dependencies ────────────────────────────────────────────────────────
+FROM base AS deps
+WORKDIR /app
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY packages/shared-types/package.json packages/shared-types/
+COPY packages/config/package.json          packages/config/
+COPY apps/web/package.json                 apps/web/
+RUN pnpm install --frozen-lockfile
+
+# ── Build ───────────────────────────────────────────────────────────────────────
+FROM deps AS builder
+COPY packages/ packages/
+COPY apps/web/ apps/web/
+RUN pnpm --filter @connecthub/shared-types build
+# VITE_API_BASE_URL is intentionally empty — nginx proxies /api at runtime
+RUN pnpm --filter @connecthub/web build
+
+# ── Production image ────────────────────────────────────────────────────────────
+FROM nginx:alpine AS runner
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
