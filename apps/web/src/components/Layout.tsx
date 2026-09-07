@@ -35,18 +35,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-muted/40">
+      {/* ── Top header ── */}
       <header className="sticky top-0 z-40 border-b bg-background shadow-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           {/* Logo */}
-          <button
-            onClick={() => navigate('/')}
-            className="text-xl font-bold text-primary"
-          >
+          <button onClick={() => navigate('/')} className="text-xl font-bold text-primary">
             ConnectHub
           </button>
 
-          {/* Nav links */}
-          <nav className="flex items-center gap-1">
+          {/* Nav links — hidden on mobile, visible on md+ */}
+          <nav className="hidden md:flex items-center gap-1">
             {navItems.map(({ to, label, icon: Icon, exact }) => (
               <NavLink
                 key={to}
@@ -55,9 +53,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className={({ isActive }) =>
                   cn(
                     'relative flex flex-col items-center gap-0.5 rounded-md px-3 py-2 text-xs font-medium transition-colors',
-                    isActive
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-foreground',
+                    isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
                   )
                 }
               >
@@ -65,7 +61,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <>
                     <Icon className="h-5 w-5" />
                     <span>{label}</span>
-                    {/* Badges */}
                     {label === 'Connections' && pendingCount > 0 && (
                       <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                         {pendingCount}
@@ -76,7 +71,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         {unreadCount}
                       </span>
                     )}
-                    {/* Active underline */}
                     {isActive && (
                       <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-primary" />
                     )}
@@ -108,7 +102,40 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+      {/* ── Page content — extra bottom padding on mobile for the bottom nav ── */}
+      <main className="mx-auto max-w-5xl px-4 py-8 pb-24 md:pb-8">{children}</main>
+
+      {/* ── Bottom nav — visible on mobile only ── */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background md:hidden">
+        <div className="flex items-center justify-around px-2 py-2">
+          {navItems.map(({ to, label, icon: Icon, exact }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={exact}
+              className={({ isActive }) =>
+                cn(
+                  'relative flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium transition-colors',
+                  isActive ? 'text-primary' : 'text-muted-foreground',
+                )
+              }
+            >
+              <Icon className="h-5 w-5" />
+              <span>{label}</span>
+              {label === 'Connections' && pendingCount > 0 && (
+                <span className="absolute right-1 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                  {pendingCount}
+                </span>
+              )}
+              {label === 'Notifications' && unreadCount > 0 && (
+                <span className="absolute right-1 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-primary-foreground">
+                  {unreadCount}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
 
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <DialogContent>
