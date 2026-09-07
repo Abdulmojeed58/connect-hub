@@ -5,8 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "connecthub",
-    "platforms": ["ios", "android"],
-    "assetBundlePatterns": ["**/*"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
@@ -16,11 +21,20 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0D51B2"
-      }
+      },
+      "package": "com.connecthub.mobile"
     },
     "plugins": [
       "expo-router",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "83da011a-6d9b-4834-86f3-cf86159b3cd0"
+      }
+    }
   }
 }
