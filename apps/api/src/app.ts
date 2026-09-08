@@ -47,10 +47,10 @@ export function createApp(): Express {
   app.use(express.json());
   app.use(cookieParser());
 
-  // Correlation ID must come before httpLogger so genReqId can read it
   app.use(correlationMiddleware);
   app.use(httpLogger);
 
+  app.get('/', (_req, res) => res.json({ status: 'ok' }));
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
   app.use('/api/auth', authRouter);
