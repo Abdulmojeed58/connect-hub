@@ -35,7 +35,7 @@ The docker desktop should be opened
 cp .env.example .env
 ```
 
-Open `.env` and fill in the two JWT secrets (everything else is optional for local use):
+Open `.env` and fill in the two JWT secrets (everything else is optional for local use): (All other environment variabke can be ignored if using docker)
 
 ```env
 JWT_ACCESS_SECRET="<random 32+ char string>"
