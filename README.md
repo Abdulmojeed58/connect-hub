@@ -27,6 +27,8 @@ The easiest way to run the app locally. Includes a PostgreSQL database — no ex
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
+The docker desktop should be opened
+
 ### Setup
 
 ```bash
