@@ -10,7 +10,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  RESEND_API_KEY: z.string().min(1),
+  RESEND_API_KEY: z.string().optional().default(''),
   RESEND_FROM_EMAIL: z.string().default('ConnectHub <onboarding@resend.dev>'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
 });

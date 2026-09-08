@@ -63,7 +63,11 @@ function highlight(text: string) {
 }
 
 // Fire and forget — email failures must never break the main request flow
-function send(payload: Parameters<typeof resend.emails.send>[0]) {
+function send(payload: Parameters<NonNullable<typeof resend>['emails']['send']>[0]) {
+  if (!resend) {
+    logger.warn({ subject: payload.subject }, 'Email skipped: RESEND_API_KEY not configured');
+    return;
+  }
   resend.emails.send(payload).catch((err) => {
     logger.error({ err, to: payload.to, subject: payload.subject }, 'Failed to send email');
   });

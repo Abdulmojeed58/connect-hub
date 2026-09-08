@@ -21,13 +21,11 @@ connecthub/
 
 ## Running with Docker
 
+The easiest way to run the app locally. Includes a PostgreSQL database — no external database account needed.
+
 ### Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- A PostgreSQL database — [Supabase](https://supabase.com), [Neon](https://neon.tech), or [Railway](https://railway.app)
-- A [Resend](https://resend.com) account
-
-
 
 ### Setup
 
@@ -35,18 +33,28 @@ connecthub/
 cp .env.example .env
 ```
 
-Fill in `.env` with your values (see [Environment variables](#environment-variables) below), then:
+Open `.env` and fill in the two JWT secrets (everything else is optional for local use):
+
+```env
+JWT_ACCESS_SECRET="<random 32+ char string>"
+JWT_REFRESH_SECRET="<random 32+ char string>"
+```
+
+Generate secrets with:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Then start everything:
 
 ```bash
 docker compose up --build
 ```
 
-
 | URL                                            |         |
 | ---------------------------------------------- | ------- |
 | [http://localhost](http://localhost)           | Web app |
 | [http://localhost:3001](http://localhost:3001) | API     |
-
 
 The API runs database migrations automatically on startup. To stop:
 
@@ -54,20 +62,21 @@ The API runs database migrations automatically on startup. To stop:
 docker compose down
 ```
 
+To also delete the database volume:
+
+```bash
+docker compose down -v
+```
+
 ---
 
-
-
-## Running locally
-
-
+## Running locally (manual)
 
 ### Prerequisites
 
 - Node.js ≥ 20
 - pnpm ≥ 9 (`npm install -g pnpm`)
-
-
+- A PostgreSQL database — [Supabase](https://supabase.com), [Neon](https://neon.tech), or any PostgreSQL instance
 
 ### Setup
 
@@ -75,8 +84,8 @@ docker compose down
 pnpm install
 pnpm --filter @connecthub/shared-types build
 
-cp apps/api/.env.example apps/api/.env
-# Fill in apps/api/.env
+cp .env.example .env
+# Fill in .env with your DATABASE_URL, DIRECT_URL, and JWT secrets
 
 pnpm --filter @connecthub/api run db:generate
 pnpm --filter @connecthub/api run db:migrate
@@ -84,16 +93,12 @@ pnpm --filter @connecthub/api run db:migrate
 pnpm dev
 ```
 
-
 | URL                                            |         |
 | ---------------------------------------------- | ------- |
 | [http://localhost:5173](http://localhost:5173) | Web app |
 | [http://localhost:3001](http://localhost:3001) | API     |
 
-
 ---
-
-
 
 ## Mobile (Expo)
 
@@ -116,49 +121,26 @@ Use your machine's LAN IP (not `localhost`) so the device/simulator can reach th
 
 ---
 
-
-
 ## Environment variables
 
-
-
-### `.env` — Docker (root)
-
+### `.env` — Docker / local dev
 
 | Variable                 | Required | Description                                                                                                    |
 | ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`           | ✅        | Pooled PostgreSQL URL. Supabase: port **6543** with `?pgbouncer=true`                                          |
-| `DIRECT_URL`             | ✅        | Direct PostgreSQL URL. Supabase: port **5432**. Used by Prisma migrations                                      |
+| `DATABASE_URL`           | Docker: auto | Pooled PostgreSQL URL. Auto-set by Docker Compose. Manual dev: provide your own |
+| `DIRECT_URL`             | Docker: auto | Direct PostgreSQL URL for Prisma migrations. Auto-set by Docker Compose |
 | `JWT_ACCESS_SECRET`      | ✅        | Random string ≥ 32 chars. Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `JWT_REFRESH_SECRET`     | ✅        | Same as above — must be different from `JWT_ACCESS_SECRET`                                                     |
-| `RESEND_API_KEY`         | ✅        | From [resend.com/api-keys](https://resend.com/api-keys)                                                        |
+| `RESEND_API_KEY`         | —        | From [resend.com/api-keys](https://resend.com/api-keys). If omitted, emails are skipped but the app still works |
 | `RESEND_FROM_EMAIL`      | —        | Sender address. Default: `ConnectHub <onboarding@resend.dev>`                                                  |
 | `JWT_ACCESS_EXPIRES_IN`  | —        | Default: `15m`                                                                                                 |
 | `JWT_REFRESH_EXPIRES_IN` | —        | Default: `7d`                                                                                                  |
-
-
-
-
-### `apps/api/.env` — local dev
-
-Same variables as above, plus:
-
-
-| Variable       | Required | Description                                                     |
-| -------------- | -------- | --------------------------------------------------------------- |
-| `NODE_ENV`     | —        | Default: `development`                                          |
-| `CORS_ORIGIN`  | —        | Default: `http://localhost:5173`                                |
-| `FRONTEND_URL` | —        | Used in password-reset emails. Default: `http://localhost:5173` |
-| `PORT`         | —        | Default: `3001`                                                 |
-
-
-
+| `PORT`                   | —        | Default: `3001`                                                                                                 |
+| `CORS_ORIGIN`            | —        | Default: `http://localhost:5173`                                                                                |
+| `FRONTEND_URL`           | —        | Used in password-reset emails. Default: `http://localhost:5173`                                                |
 
 ### `apps/mobile/.env`
-
 
 | Variable              | Required | Description                                   |
 | --------------------- | -------- | --------------------------------------------- |
 | `EXPO_PUBLIC_API_URL` | ✅        | Full API URL, e.g. `http://192.168.1.42:3001` |
-
-
